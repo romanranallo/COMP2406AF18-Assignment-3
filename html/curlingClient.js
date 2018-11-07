@@ -6,6 +6,14 @@
 const mainCanvas = document.getElementById('curlingFullCanvas')
 const zoomedCanvas = document.getElementById('curlingCloseUp')
 
+let isPlayer = false
+let socket = io("http://" + window.document.location.host)
+
+socket.on("playGame", function(data) {
+	isPlayer = true
+	console.log(isPlayer)
+})
+
 
 function drawCanvas() {
 	// Display the button in the main canvas 
@@ -61,10 +69,12 @@ $(document).ready(function() {
 
   //add mouse down listener to our canvas object
   $("#curlingFullCanvas").mousedown(handleMouseDown)
-
+  
   timer = setInterval(handleTimer, 100)
   //clearTimeout(timer) //to stop
 
+  socket.emit("playGame")
   drawCanvas()
+  
 })
 
