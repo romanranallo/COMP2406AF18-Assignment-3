@@ -28,9 +28,16 @@ socket.on("playGame", function(data) {
 })
 
 function watchGame() {
-	socket.emit("watchGame")
-	isPlayer = false
-	connectMouseListener(false)
+	socket.emit("watchGame", function(res) {
+		isPlayer = res.isPlayer
+		connectMouseListener(res.IsPlayer)
+	})
+}
+
+function joinGame() {
+	socket.emit("playGame")
+	isPlayer = true
+	connectMouseListener(true)
 }
 
 function connectMouseListener(choice) {
@@ -143,7 +150,7 @@ $(document).ready(function() {
   //This is called after the broswer has loaded the web page
 
   //add mouse down listener to our canvas object
-  connectMouseListener(true)
+  connectMouseListener(false)
   
   timer = setInterval(handleTimer, 100)
   //clearTimeout(timer) //to stop
@@ -156,7 +163,6 @@ $(document).ready(function() {
   rocks.push({ colour: 'red', x:60, y:80, played: false})
   rocks.push({ colour: 'yellow', x:59, y:300, played: false})
 
-  socket.emit("playGame")
   drawCanvas()
   
 })
