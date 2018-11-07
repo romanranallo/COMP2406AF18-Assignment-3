@@ -14,6 +14,8 @@ const url = require("url"); //to parse url strings
 const PORT = process.env.PORT || 3000
 
 const ROOT_DIR = "html"; //dir to serve static files from
+const MAX_PLAYERS = 2
+
 
 const MIME_TYPES = {
   css: "text/css",
@@ -40,12 +42,18 @@ const get_mime = function(filename) {
   return MIME_TYPES["txt"]
 }
 
-let numPlayers = 0
+let players = []
 let playersFull = false
 
-function addPlayer() {
-	numPlayers++
-	if(numPlayers >= 2) {playersFull = true}
+function addPlayer(player) {
+	if (players.length < MAX_PLAYERS) 	{ players.push(player) }
+	if (players.length >= MAX_PLAYERS) 	{ playersFull = true }
+}
+
+function removePlayer(player) {
+	players.pop(player)
+	playersFull = false
+	
 }
 
 app.listen(PORT)
@@ -93,15 +101,22 @@ function handler(request, response) {
 io.on("connection", function(socket) {
     
 	socket.on("playGame", function(data) {
+		console.log("Received Player request: " + data)
 		responseObj = {isPlayer:false}
 		if(!playersFull) {
-			addPlayer
+			addPlayer(socket)
 			responseObj.isPlayer = true;
+			console.log("Player added")
 		}
 		socket.emit("playGame", JSON.stringify(responseObj))
-	  
-		console.log("Received Player request: " + data)
-    })
+	})
+	
+	socket.on("disconnect", function() {
+		if(players.includes(socket)) {
+			removePlayer(socket)
+			console.log("Player left")
+		}
+	})
   })
   
   

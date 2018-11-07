@@ -10,7 +10,8 @@ let isPlayer = false
 let socket = io("http://" + window.document.location.host)
 
 socket.on("playGame", function(data) {
-	isPlayer = true
+	let retData = JSON.parse(data)
+	isPlayer = retData.isPlayer
 	console.log(isPlayer)
 })
 
