@@ -7,9 +7,11 @@ Richard St. John
 
 
 //Server Code -- first bit same as T02
-const http = require("http"); //need to http
+const app = require("http").createServer(handler) //need to http
+const io = require("socket.io")(app)
 const fs = require("fs"); //need to read static files
 const url = require("url"); //to parse url strings
+const PORT = process.env.PORT || 3000
 
 const ROOT_DIR = "html"; //dir to serve static files from
 
@@ -38,9 +40,17 @@ const get_mime = function(filename) {
   return MIME_TYPES["txt"]
 }
 
+let numPlayers = 0
+let playersFull = false
 
+function addPlayer() {
+	numPlayers++
+	if(numPlayers >= 2) {playersFull = true}
+}
+
+app.listen(PORT)
 // Modified from T02 to handle assignment specs
-http.createServer(function(request, response) {
+function handler(request, response) {
     let urlObj = url.parse(request.url, true, false)
     console.log("\n============================")
     console.log("PATHNAME: " + urlObj.pathname)
@@ -78,7 +88,23 @@ http.createServer(function(request, response) {
         })
       }
 	})
-  }).listen(3000)
+  })
+  
+io.on("connection", function(socket) {
+    
+	socket.on("playGame", function(data) {
+		responseObj = {isPlayer:false}
+		if(!playersFull) {
+			addPlayer
+			responseObj.isPlayer = true;
+		}
+		socket.emit("playGame", JSON.stringify(responseObj))
+	  
+		console.log("Received Player request: " + data)
+    })
+  })
+  
+  
 
 console.log("\nServer Running at PORT 3000  CNTL-C to quit")
 console.log("To Test:")
