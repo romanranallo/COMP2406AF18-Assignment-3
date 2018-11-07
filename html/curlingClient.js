@@ -15,6 +15,9 @@ const ZOOM_ROCK_RADIUS = 4*ROCK_RADIUS
 let isPlayer = false
 let socket = io("http://" + window.document.location.host)
 
+let rockPlayed
+let deltaX, deltaY
+
 socket.on("playGame", function(data) {
 	let retData = JSON.parse(data)
 	isPlayer = retData.isPlayer
@@ -128,29 +131,75 @@ function handleMouseDown(e) {
   let rect = mainCanvas.getBoundingClientRect()
   //var canvasX = e.clientX - rect.left
   //var canvasY = e.clientY - rect.top
-  let canvasX = e.clientX - rect.left //use jQuery event object pageX and pageY
+  let canvasX = e.clientX - rect.left //use jQuery event object clientX and clientY
   let canvasY = e.clientY - rect.top
   console.log("mouse down:" + canvasX + ", " + canvasY)
+
+  // Find if player clicked on a rock
+  for (let i = 0; i < rocks.length; i++) {
+
+	  let rock = rocks[i]
+	  if (Math.abs(canvasX - rock.x) <= ROCK_RADIUS && Math.abs(canvasY - rock.y) <= ROCK_RADIUS) {
+		  console.log(rock)
+		  rockPlayed = rock
+		  break
+	  }
+  }
+  
+  if (rockPlayed != null) {
+	  
+	deltaX = rockPlayed.x - canvasX
+    deltaY = rockPlayed.y - canvasY
+	$("#curlingFullCanvas").mousemove(handleMouseMove)
+    $("#curlingFullCanvas").mouseup(handleMouseUp)
+	  
+  }
+  
+  
+  e.stopPropagation()
+  e.preventDefault()
   
   drawCanvas()
 }
 
-function handleJoinButton() {
-	
-	
+function handleMouseMove(e) {
+
+  console.log("mouse move")
+
+  //get mouse location relative to canvas top left
+  let rect = mainCanvas.getBoundingClientRect()
+  let canvasX = e.clientX - rect.left
+  let canvasY = e.clientY - rect.top
+
+  rockPlayed.x = canvasX + deltaX
+  rockPlayed.y = canvasY + deltaY
+
+  e.stopPropagation()
+
+  drawCanvas()
 }
 
-function handleWatchButton() {
-	
-	
-	
+function handleMouseUp(e) {
+  console.log("mouse up")
+  
+
+  e.stopPropagation()
+
+  //$("#curlingFullCanvas").off(); //remove all event handlers from canvas
+  //$("#curlingFullCanvas").mousedown(handleMouseDown); //add mouse down handler
+
+  //remove mouse move and mouse up handlers but leave mouse down handler
+  $("#curlingFullCanvas").off("mousemove", handleMouseMove) //remove mouse move handler
+  $("#curlingFullCanvas").off("mouseup", handleMouseUp) //remove mouse up handler
+
+  drawCanvas() //redraw the canvas
 }
 
 $(document).ready(function() {
   //This is called after the broswer has loaded the web page
 
   //add mouse down listener to our canvas object
-  connectMouseListener(false)
+  connectMouseListener(true)
   
   timer = setInterval(handleTimer, 100)
   //clearTimeout(timer) //to stop
