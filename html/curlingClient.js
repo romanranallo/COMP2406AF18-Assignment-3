@@ -18,6 +18,9 @@ let socket = io("http://" + window.document.location.host)
 socket.on("playGame", function(data) {
 	let retData = JSON.parse(data)
 	isPlayer = retData.isPlayer
+	if (!isPlayer) {
+		$("#curlingFullCanvas").off("mousedown", handleMouseDown); //remove mouse move handler
+	}
 	console.log(isPlayer)
 })
 
