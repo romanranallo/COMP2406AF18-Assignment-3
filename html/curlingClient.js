@@ -12,6 +12,13 @@ const mainCanvasWidth = mainCanvas.width
 let rocks = []
 const ROCK_RADIUS = 12
 const ZOOM_ROCK_RADIUS = 4*ROCK_RADIUS
+let isPlayer = false
+let socket = io("http://" + window.document.location.host)
+
+socket.on("playGame", function(data) {
+	isPlayer = true
+	console.log(isPlayer)
+})
 
 function drawCanvas() {
 	// Display the button in the main canvas 
@@ -104,7 +111,7 @@ $(document).ready(function() {
 
   //add mouse down listener to our canvas object
   $("#curlingFullCanvas").mousedown(handleMouseDown)
-
+  
   timer = setInterval(handleTimer, 100)
   //clearTimeout(timer) //to stop
   
@@ -116,6 +123,8 @@ $(document).ready(function() {
   rocks.push({ colour: 'red', x:60, y:80})
   rocks.push({ colour: 'yellow', x:59, y:300})
 
+  socket.emit("playGame")
   drawCanvas()
+  
 })
 
