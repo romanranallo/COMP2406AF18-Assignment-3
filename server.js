@@ -111,6 +111,13 @@ io.on("connection", function(socket) {
 		socket.emit("playGame", JSON.stringify(responseObj))
 	})
 	
+	socket.on("watchGame", function {
+		if(players.includes(socket)) {
+			removePlayer()
+			console.log("player now spectating")
+		}
+	})
+	
 	socket.on("disconnect", function() {
 		if(players.includes(socket)) {
 			removePlayer(socket)
