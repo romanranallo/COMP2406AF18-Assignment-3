@@ -30,6 +30,32 @@ socket.on("playGame", function(data) {
 	console.log(isPlayer)
 })
 
+function collisionBetween(rock1, rock2) {
+	if(Math.pow((Math.pow(rock1.x-rock2.x,2)+Math.pow(rock1.y-rock2.y, 2)), 0.5) <= 2*ROCK_RADIUS) {
+		return true
+	}
+	else { return false}
+}
+
+function resolveCollision(rock1, rock2) {
+	return
+}
+
+function checkForCollisions() {
+	rocks.sort(function(a,b) {
+		return a.y - b.y
+	})
+	
+	for (let i=0; i<rocks.length-1; i++) {
+		if (rocks[i+1].y - rocks[i].y <= 2*ROCK_RADIUS) {
+			if (collisionBetween(rocks[i], rocks[i+1])) {
+				resolveCollision(rocks[i], rocks[i+1])
+			}
+		}
+		
+	}
+}
+
 function watchGame() {
 	socket.emit("watchGame", function(res) {
 		isPlayer = res.isPlayer
@@ -198,9 +224,6 @@ function handleMouseUp(e) {
 $(document).ready(function() {
   //This is called after the broswer has loaded the web page
 
-  //add mouse down listener to our canvas object
-  connectMouseListener(true)
-  
   timer = setInterval(handleTimer, 100)
   //clearTimeout(timer) //to stop
   

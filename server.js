@@ -102,7 +102,7 @@ io.on("connection", function(socket) {
 	socket.on("playGame", function(data) {
 		console.log("Received Player request: " + data)
 		responseObj = {isPlayer:false}
-		if(!playersFull) {
+		if(!playersFull && !players.includes(socket)) {
 			addPlayer(socket)
 			responseObj.isPlayer = true;
 			console.log("Player added")
