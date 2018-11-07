@@ -57,8 +57,26 @@ http.createServer(function(request, response) {
 
     //Event handler for the end of the message
     request.on("end", function() {
-		response.writeHead(200, { "Content-Type": MIME_TYPES["json"] })
-		response.end(JSON.stringify(responseObject))
+		if (request.method == "GET") {
+        //Handle GET requests
+        //Treat GET requests as request for static file
+        let filePath = ROOT_DIR + urlObj.pathname
+        if (urlObj.pathname === "/") filePath = ROOT_DIR + "/index.html"
+
+        fs.readFile(filePath, function(err, data) {
+          if (err) {
+            //report error to console
+            console.log("ERROR: " + JSON.stringify(err))
+            //respond with not found 404 to client
+            response.writeHead(404)
+            response.end(JSON.stringify(err))
+            return
+          }
+          //respond with file contents
+          response.writeHead(200, { "Content-Type": get_mime(filePath) })
+          response.end(data)
+        })
+      }
 	})
   }).listen(3000)
 
