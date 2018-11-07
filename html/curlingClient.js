@@ -50,15 +50,15 @@ function drawCanvas() {
 	
 	zoom_x = 75
 	zoom_y = 75
-	context.lineWidth = 15
+	context.lineWidth = 18.75
 	
 	context.beginPath()
-	context.arc(zoom_x, zoom_y, 20, 0, 2* Math.PI, true)
+	context.arc(zoom_x, zoom_y, 25, 0, 2* Math.PI, true)
 	context.strokeStyle = 'red'
 	context.stroke()
 	
 	context.beginPath()
-	context.arc(zoom_x, zoom_y, 50, 0, 2*Math.PI, true)
+	context.arc(zoom_x, zoom_y, 62.5, 0, 2*Math.PI, true)
     context.strokeStyle = 'blue'
 	context.stroke()
 	
@@ -110,6 +110,17 @@ function handleMouseDown(e) {
   drawCanvas()
 }
 
+function handleJoinButton() {
+	
+	
+}
+
+function handleWatchButton() {
+	
+	
+	
+}
+
 $(document).ready(function() {
   //This is called after the broswer has loaded the web page
 
@@ -120,12 +131,12 @@ $(document).ready(function() {
   //clearTimeout(timer) //to stop
   
   // Add initial rocks
-  rocks.push({ colour:'red', x: 25, y: 500})
-  rocks.push({ colour: 'yellow', x: 40, y: 525})
-  rocks.push({ colour: 'red', x:70, y:50})
-  rocks.push({ colour: 'yellow', x:70, y:60})
-  rocks.push({ colour: 'red', x:60, y:80})
-  rocks.push({ colour: 'yellow', x:59, y:300})
+  rocks.push({ colour:'red', x: 25, y: 500, played: false})
+  rocks.push({ colour: 'yellow', x: 40, y: 150, played: false})
+  rocks.push({ colour: 'red', x:70, y:50, played: false})
+  rocks.push({ colour: 'yellow', x:70, y:60, played: false})
+  rocks.push({ colour: 'red', x:60, y:80, played: false})
+  rocks.push({ colour: 'yellow', x:59, y:300, played: false})
 
   socket.emit("playGame")
   drawCanvas()
