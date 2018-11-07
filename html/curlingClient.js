@@ -67,6 +67,7 @@ function joinGame() {
 	socket.emit("playGame")
 	isPlayer = true
 	connectMouseListener(true)
+	document.getElementById('joinButton').disabled = true
 }
 
 function connectMouseListener(choice) {
