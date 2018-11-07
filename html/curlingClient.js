@@ -4,11 +4,45 @@
 */
 
 const mainCanvas = document.getElementById('curlingFullCanvas')
-const zoomCanvas = document.getElementById('curlingCloseUp')
+const zoomedCanvas = document.getElementById('curlingCloseUp')
 
 
 function drawCanvas() {
-  
+	// Display the button in the main canvas 
+	let context = zoomedCanvas.getContext('2d')
+	
+	let zoom_x = 400
+	let zoom_y = 300
+	context.lineWidth = 75
+	
+	context.beginPath()
+	context.arc(zoom_x, zoom_y, 100, 0, 2* Math.PI, true)
+	context.strokeStyle = 'red'
+	context.stroke()
+	
+	context.beginPath()
+	context.arc(zoom_x, zoom_y, 250, 0, 2*Math.PI, true)
+    context.strokeStyle = 'blue'
+	context.stroke()
+	
+	
+	// Display the button in the rink view
+	context = mainCanvas.getContext('2d')
+	
+	zoom_x = 75
+	zoom_y = 75
+	context.lineWidth = 15
+	
+	context.beginPath()
+	context.arc(zoom_x, zoom_y, 20, 0, 2* Math.PI, true)
+	context.strokeStyle = 'red'
+	context.stroke()
+	
+	context.beginPath()
+	context.arc(zoom_x, zoom_y, 50, 0, 2*Math.PI, true)
+    context.strokeStyle = 'blue'
+	context.stroke()
+	
 }
 
 
