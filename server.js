@@ -88,7 +88,7 @@ function handler(request, response) {
         })
       }
 	})
-  })
+  }
   
 io.on("connection", function(socket) {
     
