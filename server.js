@@ -52,8 +52,7 @@ function addPlayer(player) {
 
 function removePlayer(player) {
 	players.pop(player)
-	playersFull = false
-	
+	playersFull = false	
 }
 
 app.listen(PORT)
@@ -109,6 +108,13 @@ io.on("connection", function(socket) {
 			console.log("Player added")
 		}
 		socket.emit("playGame", JSON.stringify(responseObj))
+	})
+	
+	socket.on("watchGame", function() {
+		if(players.includes(socket)) {
+			removePlayer()
+			console.log("player now spectating")
+		}
 	})
 	
 	socket.on("disconnect", function() {
