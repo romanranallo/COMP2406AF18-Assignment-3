@@ -52,8 +52,7 @@ function addPlayer(player) {
 
 function removePlayer(player) {
 	players.pop(player)
-	playersFull = false
-	
+	playersFull = false	
 }
 
 app.listen(PORT)

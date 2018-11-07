@@ -19,10 +19,28 @@ socket.on("playGame", function(data) {
 	let retData = JSON.parse(data)
 	isPlayer = retData.isPlayer
 	if (!isPlayer) {
-		$("#curlingFullCanvas").off("mousedown", handleMouseDown); //remove mouse move handler
+		connectMouseListener(false)
+	}
+	else {
+		connectMouseListener(true)
 	}
 	console.log(isPlayer)
 })
+
+function watchGame() {
+	socket.emit("watchGame")
+	isPlayer = false
+	connectMouseListener(false)
+}
+
+function connectMouseListener(choice) {
+	if(choice) {
+		$("#curlingFullCanvas").mousedown(handleMouseDown)
+	}
+	else {
+		$("#curlingFullCanvas").off("mousedown", handleMouseDown); //remove mouse move handler
+	}
+}
 
 function drawCanvas() {
 	// Display the button in the main canvas 
@@ -114,7 +132,7 @@ $(document).ready(function() {
   //This is called after the broswer has loaded the web page
 
   //add mouse down listener to our canvas object
-  $("#curlingFullCanvas").mousedown(handleMouseDown)
+  connectMouseListener(true)
   
   timer = setInterval(handleTimer, 100)
   //clearTimeout(timer) //to stop
