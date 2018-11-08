@@ -228,7 +228,7 @@ function drawCanvas() {
 
 function handleTimer() {
   
-  checkForCollisions()	
+  //checkForCollisions()	
   drawCanvas()
 }
 
