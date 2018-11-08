@@ -42,7 +42,13 @@ const get_mime = function(filename) {
   return MIME_TYPES["txt"]
 }
 
-let host = null
+let rocks = []
+rocks.push({id: 0, x: 20, y: 500, v_x: 0, v_y: 0})
+rocks.push({id: 1, x: 50, y: 500, v_x: 0, v_y: 0})
+rocks.push({id: 2, x: 80, y: 500, v_x: 0, v_y: 0})
+rocks.push({id: 3, x: 110, y: 510, v_x: 0, v_y: 0})
+rocks.push({id: 4, x: 20, y: 100, v_x: 0, v_y: 0})
+rocks.push({id: 5, x: 70, y: 300, v_x: 0, v_y: 0})
 let spectators = []
 let players = []
 let playersFull = false
@@ -112,7 +118,7 @@ function handler(request, response) {
         let filePath = ROOT_DIR + urlObj.pathname
         if (urlObj.pathname === "/") filePath = ROOT_DIR + "/index.html"
 
-        fs.readFile(filePath, function(err, data) {
+        fs.readFile(filePath, function(err	, data) {
           if (err) {
             //report error to console
             console.log("ERROR: " + JSON.stringify(err))
@@ -162,23 +168,26 @@ io.on("connection", function(socket) {
 	
     socket.on('rockData', function(data){
 		console.log('RECEIVED ROCK DATA: ' + data)
+		rocks[data.id] = data
 		//to broadcast message to everyone including sender:
 		io.emit('rockData', data) //broadcast to everyone including sender
 	})
 	
-	socket.on('requestData', function(data) {
+	/*socket.on('requestData', function(data) {
 		console.log("host is null:", (host==null))
 		if(host != null) {
 			console.log("ask host for data")
 			host.emit('requestData')
 		}
-	})
+	})*/
 	
-	socket.on('updateFromHost', function(data) {
-		io.emit('rockData', data)
-	})
+	io.emit("rocksData", JSON.stringify(rocks))
 	
-	timer = setInterval(reqData, 1000)
+	//socket.on('updateFromHost', function(data) {
+		//io.emit('rockData', data)
+	//})
+	
+	//timer = setInterval(reqData, 1000)
 })
   
   

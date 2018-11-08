@@ -27,7 +27,7 @@ let rockPlayed
 let deltaX, deltaY
 let canvasX, canvasY
 
-socket.emit('requestData')
+//socket.emit('requestData')
 
 socket.on("playGame", function(data) {
 	let retData = JSON.parse(data)
@@ -42,6 +42,7 @@ socket.on("playGame", function(data) {
 })
 
 socket.on('requestData', function() {
+	console.log("In request data")
 	for (let i=0; i<rocks.length; i++) {
 		socket.emit('rockData', JSON.stringify(rocks[i]))
 	}
@@ -59,7 +60,7 @@ function joinGame() {
 }
 
 socket.on('rockData', function(data) {
-	//console.log("data: " + data)
+	console.log("data: " + data)
 	//console.log("typeof: " + typeof data)
 	
 	let rockInfo = JSON.parse(data)
@@ -73,6 +74,19 @@ socket.on('rockData', function(data) {
 	//console.log("rock array AFTER", rocks)
 	//rocks[rockInfo.id] = rock
 	//drawCanvas()
+})
+
+socket.on('rocksData', function(data) {
+	rockArr = JSON.parse(data)
+	console.log("rocksData", data)
+	for (let i = 0; i < rockArr.length; i++) {
+		let rock = rocks[i]
+		rock.x = data.x
+		rock.y = data.y
+		rock.v_x = data.v_x
+		rock.v_y = data.v_y
+	}
+	
 })
 
 function collisionBetween(rock1, rock2) {
@@ -196,6 +210,7 @@ function connectMouseListener(choice) {
 }
 
 function drawCanvas() {
+	console.log(rocks)
 	// Display the button in the main canvas 
 	let context = zoomedCanvas.getContext('2d')
 	context.clearRect(0, 0, zoomedCanvas.width, zoomedCanvas.height)
