@@ -34,8 +34,18 @@ socket.on("playGame", function(data) {
 	else {
 		connectMouseListener(false)
 	}
-	console.log(retData.isPlayer)
 })
+
+function watchGame() {
+	socket.emit("watchGame")
+	connectMouseListener(false)
+	document.getElementById('joinButton').disabled = false
+	
+}
+
+function joinGame() {
+	socket.emit("playGame")
+}
 
 socket.on('rockData', function(data) {
 	console.log("data: " + data)
@@ -76,17 +86,6 @@ function checkForCollisions() {
 		}
 		
 	}
-}
-
-function watchGame() {
-	socket.emit("watchGame")
-	connectMouseListener(false)
-	document.getElementById('joinButton').disabled = false
-	
-}
-
-function joinGame() {
-	socket.emit("playGame")
 }
 
 function connectMouseListener(choice) {
