@@ -42,17 +42,49 @@ const get_mime = function(filename) {
   return MIME_TYPES["txt"]
 }
 
+let host = null
+let spectators = []
 let players = []
 let playersFull = false
 
 function addPlayer(player) {
-	if (players.length < MAX_PLAYERS) 	{ players.push(player) }
-	if (players.length >= MAX_PLAYERS) 	{ playersFull = true }
+	if (players.length === 0)			{host = player}
+	if (players.length < MAX_PLAYERS) 	{players.push(player) }
+	if (players.length >= MAX_PLAYERS) 	{playersFull = true }
 }
 
 function removePlayer(player) {
 	players.pop(player)
 	playersFull = false	
+	if (player === host) {
+		if (players.length === 0) {
+			if(spectators.length === 0) {
+				host = null
+			}
+			else {host = spectators[0]}
+		}
+		else {host = players[0]}
+	}
+}
+
+function addSpectator(spec) {
+	if(players.length === 0 && spectators.length === 0) {host = spec}
+	spectators.push(spec)
+}
+
+function removeSpectator(spec) {
+	spectators.pop(spec)
+	if(spec === host) {
+		host = null
+	}
+}
+
+function reqData(data) {
+	console.log("host is null:", (host==null))
+	if(host != null) {
+		console.log("ask host for data")
+		host.emit('requestData')
+	}
 }
 
 app.listen(PORT)
@@ -98,11 +130,13 @@ function handler(request, response) {
   }
   
 io.on("connection", function(socket) {
-    
+	addSpectator(socket)
+	
 	socket.on("playGame", function(data) {
 		console.log("Received Player request: " + data)
 		responseObj = {isPlayer:false}
 		if(!playersFull && !players.includes(socket)) {
+			removeSpectator(socket)
 			addPlayer(socket)
 			responseObj.isPlayer = true;
 			console.log("Player added")
@@ -112,7 +146,8 @@ io.on("connection", function(socket) {
 	
 	socket.on("watchGame", function() {
 		if(players.includes(socket)) {
-			removePlayer()
+			removePlayer(socket)
+			addSpectator(socket)
 			console.log("player now spectating")
 		}
 	})
@@ -120,6 +155,7 @@ io.on("connection", function(socket) {
 	socket.on("disconnect", function() {
 		if(players.includes(socket)) {
 			removePlayer(socket)
+			removeSpectator(socket)
 			console.log("Player left")
 		}
 	})
@@ -129,7 +165,20 @@ io.on("connection", function(socket) {
 		//to broadcast message to everyone including sender:
 		io.emit('rockData', data) //broadcast to everyone including sender
 	})
-
+	
+	socket.on('requestData', function(data) {
+		console.log("host is null:", (host==null))
+		if(host != null) {
+			console.log("ask host for data")
+			host.emit('requestData')
+		}
+	})
+	
+	socket.on('updateFromHost', function(data) {
+		io.emit('rockData', data)
+	})
+	
+	timer = setInterval(reqData, 1000)
 })
   
   

@@ -27,6 +27,8 @@ let rockPlayed
 let deltaX, deltaY
 let canvasX, canvasY
 
+socket.emit('requestData')
+
 socket.on("playGame", function(data) {
 	let retData = JSON.parse(data)
 	if (retData.isPlayer) {
@@ -36,6 +38,12 @@ socket.on("playGame", function(data) {
 	}
 	else {
 		connectMouseListener(false)
+	}
+})
+
+socket.on('requestData', function() {
+	for (let i=0; i<rocks.length; i++) {
+		socket.emit('rockData', JSON.stringify(rocks[i]))
 	}
 })
 
@@ -84,10 +92,10 @@ function resolveCollision(rock1, rock2) {
 	let theta = Math.atan((rock2.y-rock1.y)/(rock2.x-rock1.x))
 	
 	if (rock2.y > rock1.y) {rock2.y += (2*ROCK_RADIUS-d)*Math.cos(theta)}
-	else {rock1.y += (2*ROCK_RADIUS-d)*Math.cos(theta)}
+	else {rock1.y += (2*ROCK_RADIUS-d)*Math.cos(theta) + 5}
 	
 	if(rock2.x > rock1.x) {rock2.x += (2*ROCK_RADIUS-d)*Math.sin(theta)}
-	else {rock1.x += (2*ROCK_RADIUS-d)*Math.sin(theta)}
+	else {rock1.x += (2*ROCK_RADIUS-d)*Math.sin(theta) + 5}
 	
 	let deltaV_1 = getDeltaVel(rock1, theta)
 	let deltaV_2 = getDeltaVel(rock2, theta)
@@ -111,6 +119,11 @@ function resolveCollision(rock1, rock2) {
 	rock2.v_y -= deltaV_2.v_y
 	rock1.v_x += deltaV_2.v_x
 	rock1.v_y += deltaV_2.v_y
+	
+	rock1.v_x *= 0.8
+	rock1.v_y *= 0.8
+	rock2.v_x *= 0.8
+	rock2.v_y *= 0.8
 	
 	//console.log("Rock 1 after collision: ", rock1)
 	//console.log("Rock 2 after collision: ", rock2)
@@ -147,10 +160,13 @@ function checkForCollisions() {
 		return a.y - b.y
 	})
 	
-	for (let i=0; i<rocks_copy.length-1; i++) {
-		if (rocks_copy[i+1].y - rocks_copy[i].y <= 2*ROCK_RADIUS) {
-			if (collisionBetween(rocks_copy[i], rocks_copy[i+1])) {
-				resolveCollision(rocks_copy[i], rocks_copy[i+1])
+	for (let i=0; i<rocks_copy.length; i++) {
+		for (let j=0; j<rocks_copy.length; j++){
+			if (i == j) {continue}
+			if (rocks_copy[i].y - rocks_copy[j].y <= 2*ROCK_RADIUS) {
+				if (collisionBetween(rocks_copy[i], rocks_copy[j])) {
+					resolveCollision(rocks_copy[i], rocks_copy[j])
+				}
 			}
 		}
 	}
