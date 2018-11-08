@@ -43,6 +43,7 @@ socket.on("playGame", function(data) {
 
 socket.on('requestData', function() {
 	for (let i=0; i<rocks.length; i++) {
+		console.log("sending data to server")
 		socket.emit('rockData', JSON.stringify(rocks[i]))
 	}
 })
@@ -87,7 +88,7 @@ function collisionBetween(rock1, rock2) {
 
 function resolveCollision(rock1, rock2) {
 	
-	console.log("Rock 1 before collision: ", rock1)
+	//console.log("Rock 1 before collision: ", rock1)
 	let d = Math.pow((Math.pow(rock1.x-rock2.x,2)+Math.pow(rock1.y-rock2.y, 2)), 0.5)
 	let theta = Math.atan((rock2.y-rock1.y)/(rock2.x-rock1.x))
 	
