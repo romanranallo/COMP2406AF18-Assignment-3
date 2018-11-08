@@ -10,12 +10,12 @@ const mainCanvasHeight = mainCanvas.height
 const mainCanvasWidth = mainCanvas.width
 
 let rocks = []  // Add initial rocks
-rocks.push({ id: 0, colour:'red', x: 25, y: 500, played: false})
-rocks.push({ id: 1, colour: 'yellow', x: 40, y: 150, played: false})
-rocks.push({ id: 2, colour: 'red', x:70, y:50, played: false})
-rocks.push({ id: 3, colour: 'yellow', x:70, y:60, played: false})
-rocks.push({ id: 4, colour: 'red', x:60, y:80, played: false})
-rocks.push({ id: 5, colour: 'yellow', x:59, y:300, played: false})
+rocks.push({ id: 0, colour:'red', x: 25, y: 500, played: false, speed: 0, direction: 0})
+rocks.push({ id: 1, colour: 'yellow', x: 40, y: 150, played: false, speed: 0, direction: 0})
+rocks.push({ id: 2, colour: 'red', x:70, y:50, played: false, speed: 0, direction: 0})
+rocks.push({ id: 3, colour: 'yellow', x:70, y:60, played: false, speed: 0, direction: 0})
+rocks.push({ id: 4, colour: 'red', x:60, y:80, played: false, speed: 0, direction: 0})
+rocks.push({ id: 5, colour: 'yellow', x:59, y:300, played: false, speed: 0, direction: 0})
 const ROCK_RADIUS = 12
 const ZOOM_ROCK_RADIUS = 4*ROCK_RADIUS
 
@@ -23,6 +23,7 @@ let socket = io("http://" + window.document.location.host)
 
 let rockPlayed
 let deltaX, deltaY
+let canvasX, canvasY
 
 socket.on("playGame", function(data) {
 	let retData = JSON.parse(data)
@@ -146,7 +147,7 @@ function drawCanvas() {
 		context.strokeStyle = 'grey'
 		context.stroke()
 		
-		if (rock.y <= 150) {
+		if (rock.y <= 150 + ROCK_RADIUS + 5) {
 			context = zoomedCanvas.getContext('2d')
 			context.beginPath()
 			context.arc(rock.x*4, rock.y*4, ZOOM_ROCK_RADIUS, 0, 2*Math.PI, true)
@@ -158,8 +159,15 @@ function drawCanvas() {
 			
 		}
 		
-		
 		context = mainCanvas.getContext('2d')
+	}
+	
+	if (rockPlayed != null) {
+		context.beginPath()
+		context.moveTo(rockPlayed.x, rockPlayed.y)
+		context.lineTo(canvasX, canvasY)
+		context.strokeStyle = 'black'
+		context.stroke()
 	}
 	
 }
@@ -176,8 +184,8 @@ function handleMouseDown(e) {
   let rect = mainCanvas.getBoundingClientRect()
   //var canvasX = e.clientX - rect.left
   //var canvasY = e.clientY - rect.top
-  let canvasX = e.clientX - rect.left //use jQuery event object clientX and clientY
-  let canvasY = e.clientY - rect.top
+  canvasX = e.clientX - rect.left //use jQuery event object clientX and clientY
+  canvasY = e.clientY - rect.top
   console.log("mouse down:" + canvasX + ", " + canvasY)
 
   // Find if player clicked on a rock
@@ -216,11 +224,11 @@ function handleMouseMove(e) {
 
   //get mouse location relative to canvas top left
   let rect = mainCanvas.getBoundingClientRect()
-  let canvasX = e.clientX - rect.left
-  let canvasY = e.clientY - rect.top
+  canvasX = e.clientX - rect.left
+  canvasY = e.clientY - rect.top
 
-  rockPlayed.x = canvasX + deltaX
-  rockPlayed.y = canvasY + deltaY
+  //rockPlayed.x = canvasX + deltaX
+  //rockPlayed.y = canvasY + deltaY
 
   e.stopPropagation()
   let dataObj = { id: rockPlayed.id, x: rockPlayed.x, y: rockPlayed.y }
@@ -245,7 +253,8 @@ function handleMouseUp(e) {
   let dataObj = { id: rockPlayed.id, x: rockPlayed.x, y: rockPlayed.y }
   let jsonString = JSON.stringify(dataObj)
   socket.emit("rockData", jsonString)
-
+  
+  rockPlayed = null
 }
 
 $(document).ready(function() {
