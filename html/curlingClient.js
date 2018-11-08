@@ -173,15 +173,23 @@ function checkForCollisions() {
 	for (let i=0; i<rocks_copy.length; i++) {
 		if (rocks[i].x + ROCK_RADIUS > mainCanvasWidth)  {
 			rocks[i].v_x = -Math.abs(rocks[i].v_x)
+			rocks[i].v_x *= 0.8
+			rocks[i].x = mainCanvasWidth-ROCK_RADIUS
 		}
 		else if(rocks[i].x - ROCK_RADIUS < 0) {
 			rocks[i].v_x = Math.abs(rocks[i].v_x)
+			rocks[i].v_x *= 0.8
+			rocks[i].x = ROCK_RADIUS
 		}
 		if (rocks[i].y + ROCK_RADIUS > mainCanvasHeight)  {
 			rocks[i].v_y = -Math.abs(rocks[i].v_y)
+			rocks[i].v_y *= 0.8
+			rocks[i].y = mainCanvasHeight-ROCK_RADIUS
 		}
 		else if (rocks[i].y - ROCK_RADIUS < 0) {
 			rocks[i].v_y = Math.abs(rocks[i].v_y)
+			rocks[i].v_y *= 0.8
+			rocks[i].y = ROCK_RADIUS
 		}
 	}
 }
