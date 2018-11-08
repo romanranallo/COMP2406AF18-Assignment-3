@@ -13,8 +13,8 @@ let rocks = []  // Add initial rocks
 rocks.push({ id: 0, colour:'red', x: 25, y: 500, played: false, v_x: 0, v_y: 0})
 rocks.push({ id: 1, colour: 'yellow', x: 40, y: 150, played: false, v_x: 0, v_y: 0})
 rocks.push({ id: 2, colour: 'red', x:70, y:50, played: false, v_x: 0, v_y: 0})
-rocks.push({ id: 3, colour: 'yellow', x:70, y:60, played: false, v_x: 0, v_y: 0})
-rocks.push({ id: 4, colour: 'red', x:60, y:80, played: false, v_x: 0, v_y: 0})
+rocks.push({ id: 3, colour: 'yellow', x:70, y:100, played: false, v_x: 0, v_y: 0})
+rocks.push({ id: 4, colour: 'red', x:70, y:150, played: false, v_x: 0, v_y: 0})
 rocks.push({ id: 5, colour: 'yellow', x:59, y:300, played: false, v_x: 0, v_y: 0})
 const ROCK_RADIUS = 12
 const ZOOM_ROCK_RADIUS = 4*ROCK_RADIUS
@@ -73,6 +73,9 @@ function collisionBetween(rock1, rock2) {
 }
 
 function resolveCollision(rock1, rock2) {
+	
+	console.log("Rock 1 before collision: ", rock1)
+	
 	let theta = Math.atan((rock2.y-rock1.y)/(rock2.x-rock1.x))
 	let deltaV_1 = getDeltaVel(rock1, theta)
 	let deltaV_2 = getDeltaVel(rock2, theta)
@@ -109,14 +112,25 @@ function getDeltaVel(rock, theta) {
 }
 
 function checkForCollisions() {
-	rocks.sort(function(a,b) {
+	
+	rocks_copy = rocks.slice()
+	rocks_copy.sort(function(a,b) {
 		return a.y - b.y
 	})
 	
-	for (let i=0; i<rocks.length-1; i++) {
-		if (rocks[i+1].y - rocks[i].y <= 2*ROCK_RADIUS) {
-			if (collisionBetween(rocks[i], rocks[i+1])) {
-				resolveCollision(rocks[i], rocks[i+1])
+	//console.log("after sort", rocks_copy)
+	
+	for (let i=0; i<rocks_copy.length-1; i++) {
+		if (rocks_copy[i+1].y - rocks_copy[i].y <= 2*ROCK_RADIUS) {
+			console.log(rocks_copy[i])
+			console.log(rocks_copy[i+1])
+			
+			if (collisionBetween(rocks_copy[i], rocks_copy[i+1])) {
+				
+				console.log(rocks_copy[i])
+				console.log(rocks_copy[i+1])
+				
+				resolveCollision(rocks_copy[i], rocks_copy[i+1])
 			}
 		}
 		
