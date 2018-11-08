@@ -27,11 +27,24 @@ let rockPlayed
 let deltaX, deltaY
 let canvasX, canvasY
 
+let isControllingRed = false
+let isControllingYellow = false
+
+let name = ''
+
 //socket.emit('requestData')
 
 socket.on("playGame", function(data) {
 	let retData = JSON.parse(data)
 	if (retData.isPlayer) {
+		if (retData.colour == "red") {
+			isControllingRed = true
+			document.getElementById("text-area").innerText = "Hi " + name + ". You have control of RED"
+		}
+		else {
+			isControllingYellow = true
+			document.getElementById("text-area").innerText = "Hi " + name + ". You have control of RED"
+		}
 		connectMouseListener(true)
 		document.getElementById('joinButton').disabled = true
 		
@@ -57,6 +70,13 @@ function watchGame() {
 }
 
 function joinGame() {
+	if ($('#userTextField').val() == '') {
+		window.alert("Please enter your name")
+		return 
+	}
+	name = $('#userTextField').val()
+	$('#userTextField').val('')
+	
 	socket.emit("playGame")
 }
 
@@ -220,7 +240,7 @@ function connectMouseListener(choice) {
 }
 
 function drawCanvas() {
-	console.log(rocks)
+	//console.log(rocks)
 	// Display the button in the main canvas 
 	let context = zoomedCanvas.getContext('2d')
 	context.clearRect(0, 0, zoomedCanvas.width, zoomedCanvas.height)
@@ -358,7 +378,13 @@ function handleMouseDown(e) {
 	  let rock = rocks[i]
 	  if (Math.abs(canvasX - rock.x) <= ROCK_RADIUS && Math.abs(canvasY - rock.y) <= ROCK_RADIUS) {
 		  //console.log("ROCK FOUND", rock)
-		  rockPlayed = rock
+		  if (rock.colour == "red") {
+			  if (isControllingRed) rockPlayed = rock
+		  }
+		  else {
+			  if (isControllingYellow) rockPlayed = rock
+		  }
+		  //rockPlayed = rock
 		  break
 	  }
   }
@@ -438,12 +464,38 @@ function handleMouseUp(e) {
   rockPlayed = null
 }
 
+//KEY CODES
+const ENTER = 13
+
+// Took out all the arrow key code from T02
+function handleKeyDown(e) {
+
+  console.log("keydown code = " + e.which)
+}
+
+// Removed all arrow key handling
+function handleKeyUp(e) {
+  console.log("key UP: " + e.which)
+
+  if (isControllingRed || isControllingYellow) return
+  if (e.which == ENTER) {
+    joinGame() //treat ENTER key like you would a submit
+    $('#userTextField').val('') //clear the user text field
+  }
+
+  e.stopPropagation()
+  e.preventDefault()
+}
+
 $(document).ready(function() {
   //This is called after the broswer has loaded the web page
 
   timer = setInterval(handleTimer, 10)
   //clearTimeout(timer) //to stop
-  
+  //add key handler for the document as a whole, not separate words[i]ments.
+  $(document).keydown(handleKeyDown)
+  $(document).keyup(handleKeyUp)
+
 
 
   drawCanvas()

@@ -16,6 +16,8 @@ const PORT = process.env.PORT || 3000
 const ROOT_DIR = "html"; //dir to serve static files from
 const MAX_PLAYERS = 2
 
+let redPlayer = null
+let yellowPlayer = null
 
 const MIME_TYPES = {
   css: "text/css",
@@ -54,14 +56,22 @@ let players = []
 let playersFull = false
 
 function addPlayer(player) {
-	if (players.length === 0)			{host = player}
-	if (players.length < MAX_PLAYERS) 	{players.push(player) }
+	if (players.length === 0) {
+		host = player
+	}
+	if (players.length < MAX_PLAYERS) {
+		if (redPlayer == null) redPlayer = player
+		else yellowPlayer = player
+		players.push(player) 
+	}
 	if (players.length >= MAX_PLAYERS) 	{playersFull = true }
 }
 
 function removePlayer(player) {
 	players.pop(player)
 	playersFull = false	
+	if (player == redPlayer) redPlayer = null
+	else if (player == yellowPlayer) yellowPlayer = null
 	if (player === host) {
 		if (players.length === 0) {
 			if(spectators.length === 0) {
@@ -140,11 +150,13 @@ io.on("connection", function(socket) {
 	
 	socket.on("playGame", function(data) {
 		console.log("Received Player request: " + data)
-		responseObj = {isPlayer:false}
+		responseObj = {isPlayer:false, colour: "none"}
 		if(!playersFull && !players.includes(socket)) {
 			removeSpectator(socket)
 			addPlayer(socket)
 			responseObj.isPlayer = true;
+			if (socket == redPlayer) responseObj.colour = "red"
+			else if (socket == yellowPlayer) responseObj.colour = "yellow"
 			console.log("Player added")
 		}
 		socket.emit("playGame", JSON.stringify(responseObj))
