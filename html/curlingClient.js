@@ -491,7 +491,7 @@ $(document).ready(function() {
   $(document).keydown(handleKeyDown)
   $(document).keyup(handleKeyUp)
   
-  document.getElementById("text-area").innerHTML = "Welcome. Click 'Join Game' to take control of a rock."
+  document.getElementById("text-area").innerHTML = "Welcome. Click 'Join Game' to take control of a rock. Click 'Watch Game' to give up the rock."
 
 
 
