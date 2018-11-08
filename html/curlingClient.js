@@ -81,6 +81,10 @@ function resolveCollision(rock1, rock2) {
 	let deltaV_1 = getDeltaVel(rock1, theta)
 	let deltaV_2 = getDeltaVel(rock2, theta)
 	
+	console.log(deltaV_1)
+	console.log(deltaV_2)
+
+	
 	console.log("Rock 1 before collision: ", rock1)
 	console.log("Rock 2 before collision: ", rock2)
 	
@@ -102,7 +106,11 @@ function resolveCollision(rock1, rock2) {
 }
 
 function getDeltaVel(rock, theta) {
-	let phi = Math.atan((rock.v_y/rock.v_x))
+	let phi  
+	if (rock.v_x !== 0) {
+		phi = Math.atan((rock.v_y/rock.v_x))
+	}
+	else {phi = 90}
 	let alpha = phi-theta
 	let v = rock.v_y/Math.sin(phi)
 	let u = v*Math.cos(alpha)
@@ -119,22 +127,20 @@ function checkForCollisions() {
 		return a.y - b.y
 	})
 	
-	//console.log("after sort", rocks_copy)
-	
 	for (let i=0; i<rocks_copy.length-1; i++) {
 		if (rocks_copy[i+1].y - rocks_copy[i].y <= 2*ROCK_RADIUS) {
-			//console.log(rocks_copy[i])
-			//console.log(rocks_copy[i+1])
-			
 			if (collisionBetween(rocks_copy[i], rocks_copy[i+1])) {
-				
-				//console.log(rocks_copy[i])
-				//console.log(rocks_copy[i+1])
-				
 				resolveCollision(rocks_copy[i], rocks_copy[i+1])
 			}
 		}
-		
+	}
+	for (let i=0; i<rocks_copy.length; i++) {
+		if(rocks[i].x + ROCK_RADIUS > mainCanvasWidth || rocks[i].x - ROCK_RADIUS < 0) {
+			rocks[i].v_x = -1*Math.abs(rocks[i].v_x)
+		}
+		if (rocks[i].y + ROCK_RADIUS > mainCanvasHeight || rocks[i].y - ROCK_RADIUS < 0) {
+			rocks[i].v_y = -1*Math.abs(rocks[i].v_y)
+		}
 	}
 }
 
