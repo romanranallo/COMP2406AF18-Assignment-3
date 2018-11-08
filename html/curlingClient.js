@@ -9,14 +9,13 @@ const zoomedCanvas = document.getElementById('curlingCloseUp')
 const mainCanvasHeight = mainCanvas.height
 const mainCanvasWidth = mainCanvas.width
 
-let rocks = [  // Add initial rocks
-  { id: 1, colour:'red', x: 25, y: 500, played: false},
-  { id: 2, colour: 'yellow', x: 40, y: 150, played: false},
-  { id: 3, colour: 'red', x:70, y:50, played: false},
-  { id: 4, colour: 'yellow', x:70, y:60, played: false},
-  { id: 5, colour: 'red', x:60, y:80, played: false},
-  { id: 6, colour: 'yellow', x:59, y:300, played: false}
-]
+let rocks = []  // Add initial rocks
+rocks.push({ id: 0, colour:'red', x: 25, y: 500, played: false})
+rocks.push({ id: 1, colour: 'yellow', x: 40, y: 150, played: false})
+rocks.push({ id: 2, colour: 'red', x:70, y:50, played: false})
+rocks.push({ id: 3, colour: 'yellow', x:70, y:60, played: false})
+rocks.push({ id: 4, colour: 'red', x:60, y:80, played: false})
+rocks.push({ id: 5, colour: 'yellow', x:59, y:300, played: false})
 const ROCK_RADIUS = 12
 const ZOOM_ROCK_RADIUS = 4*ROCK_RADIUS
 
@@ -44,9 +43,11 @@ socket.on('rockData', function(data) {
 	
 	let rockInfo = JSON.parse(data)
 	console.log("rock info", rockInfo)
-	let rock = rocks.find(rock => rock.id = rockInfo.id)
+	console.log("rock array BEFORE", rocks)
+	let rock = rocks[rockInfo.id]
 	rock.x = rockInfo.x
 	rock.y = rockInfo.y
+	console.log("rock array AFTER", rocks)
 	//rocks[rockInfo.id] = rock
 	drawCanvas()
 })
