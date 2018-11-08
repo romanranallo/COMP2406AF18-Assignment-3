@@ -10,12 +10,12 @@ const mainCanvasHeight = mainCanvas.height
 const mainCanvasWidth = mainCanvas.width
 
 let rocks = []  // Add initial rocks
-rocks.push({ id: 0, colour:'red', x: 25, y: 500, played: false, speed: 0, direction: 0})
-rocks.push({ id: 1, colour: 'yellow', x: 40, y: 150, played: false, speed: 0, direction: 0})
-rocks.push({ id: 2, colour: 'red', x:70, y:50, played: false, speed: 0, direction: 0})
-rocks.push({ id: 3, colour: 'yellow', x:70, y:60, played: false, speed: 0, direction: 0})
-rocks.push({ id: 4, colour: 'red', x:60, y:80, played: false, speed: 0, direction: 0})
-rocks.push({ id: 5, colour: 'yellow', x:59, y:300, played: false, speed: 0, direction: 0})
+rocks.push({ id: 0, colour:'red', x: 25, y: 500, played: false, v_x: 0, v_y: 0})
+rocks.push({ id: 1, colour: 'yellow', x: 40, y: 150, played: false, v_x: 0, v_y: 0})
+rocks.push({ id: 2, colour: 'red', x:70, y:50, played: false, v_x: 0, v_y: 0})
+rocks.push({ id: 3, colour: 'yellow', x:70, y:60, played: false, v_x: 0, v_y: 0})
+rocks.push({ id: 4, colour: 'red', x:60, y:80, played: false, v_x: 0, v_y: 0})
+rocks.push({ id: 5, colour: 'yellow', x:59, y:300, played: false, v_x: 0, v_y: 0})
 const ROCK_RADIUS = 12
 const ZOOM_ROCK_RADIUS = 4*ROCK_RADIUS
 
@@ -58,9 +58,11 @@ socket.on('rockData', function(data) {
 	let rock = rocks[rockInfo.id]
 	rock.x = rockInfo.x
 	rock.y = rockInfo.y
+	rock.v_x = rockInfo.v_x
+	rock.v_y = rockInfo.v_y
 	console.log("rock array AFTER", rocks)
 	//rocks[rockInfo.id] = rock
-	drawCanvas()
+	//drawCanvas()
 })
 
 function collisionBetween(rock1, rock2) {
@@ -139,6 +141,9 @@ function drawCanvas() {
 	// Draw rocks
 	for (let i = 0; i < rocks.length; i++) {
 		let rock = rocks[i]
+		// Deal with speed
+		rock.x += rock.v_x
+		rock.y += rock.v_y
 		context.beginPath()
 		context.arc(rock.x, rock.y, ROCK_RADIUS, 0, 2*Math.PI, true)
 		context.lineWidth = 5
@@ -169,6 +174,8 @@ function drawCanvas() {
 		context.strokeStyle = 'black'
 		context.stroke()
 	}
+	
+	
 	
 }
 
@@ -209,13 +216,13 @@ function handleMouseDown(e) {
   }
   else return
   
-  let dataObj = { id: rockPlayed.id, x: rockPlayed.x, y: rockPlayed.y }
+  let dataObj = { id: rockPlayed.id, x: rockPlayed.x, y: rockPlayed.y, v_x: rockPlayed.v_x, v_y: rockPlayed.v_y }
   let jsonString = JSON.stringify(dataObj)
   socket.emit("rockData",jsonString)
   e.stopPropagation()
   e.preventDefault()
   
-  drawCanvas()
+  //drawCanvas()
 }
 
 function handleMouseMove(e) {
@@ -231,11 +238,11 @@ function handleMouseMove(e) {
   //rockPlayed.y = canvasY + deltaY
 
   e.stopPropagation()
-  let dataObj = { id: rockPlayed.id, x: rockPlayed.x, y: rockPlayed.y }
+  let dataObj = { id: rockPlayed.id, x: rockPlayed.x, y: rockPlayed.y, v_x: 0, v_y: 0 }
   let jsonString = JSON.stringify(dataObj)
   socket.emit("rockData", jsonString)
 
-  drawCanvas()
+  //drawCanvas()
 }
 
 function handleMouseUp(e) {
@@ -250,7 +257,15 @@ function handleMouseUp(e) {
   //remove mouse move and mouse up handlers but leave mouse down handler
   $("#curlingFullCanvas").off("mousemove", handleMouseMove) //remove mouse move handler
   $("#curlingFullCanvas").off("mouseup", handleMouseUp) //remove mouse up handler
-  let dataObj = { id: rockPlayed.id, x: rockPlayed.x, y: rockPlayed.y }
+  
+  // Calculate the Euclidean distance between the rock and the cursor
+  let x_comp = rockPlayed.x - canvasX
+  let y_comp = rockPlayed.y - canvasY
+  
+  rockPlayed.v_x = x_comp/100
+  rockPlayed.v_y = y_comp/100
+  
+  let dataObj = { id: rockPlayed.id, x: rockPlayed.x, y: rockPlayed.y, v_x: rockPlayed.v_x, v_y: rockPlayed.v_y }
   let jsonString = JSON.stringify(dataObj)
   socket.emit("rockData", jsonString)
   
@@ -260,7 +275,7 @@ function handleMouseUp(e) {
 $(document).ready(function() {
   //This is called after the broswer has loaded the web page
 
-  timer = setInterval(handleTimer, 100)
+  timer = setInterval(handleTimer, 10)
   //clearTimeout(timer) //to stop
   
 
