@@ -243,13 +243,22 @@ function handleMouseDown(e) {
 	  
 	deltaX = rockPlayed.x - canvasX
     deltaY = rockPlayed.y - canvasY
-	$("#curlingFullCanvas").mousemove(handleMouseMove)
-    $("#curlingFullCanvas").mouseup(handleMouseUp)
+	if (rockPlayed.v_x == 0 && rockPlayed.v_y == 0) {
+		$("#curlingFullCanvas").mousemove(handleMouseMove)
+		$("#curlingFullCanvas").mouseup(handleMouseUp)
+	}
+	else {
+		rockPlayed.v_x = 0
+		rockPlayed.v_y = 0
+		rockPlayed = null
+		return
+	}
+	
 	  
   }
   else return
   
-  let dataObj = { id: rockPlayed.id, x: rockPlayed.x, y: rockPlayed.y, v_x: rockPlayed.v_x, v_y: rockPlayed.v_y }
+  let dataObj = { id: rockPlayed.id, x: rockPlayed.x, y: rockPlayed.y, v_x: 0, v_y: 0 }
   let jsonString = JSON.stringify(dataObj)
   socket.emit("rockData",jsonString)
   e.stopPropagation()
