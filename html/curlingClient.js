@@ -135,11 +135,11 @@ function checkForCollisions() {
 		}
 	}
 	for (let i=0; i<rocks_copy.length; i++) {
-		if(rocks[i].x + ROCK_RADIUS > mainCanvasWidth || rocks[i].x - ROCK_RADIUS < 0) {
-			rocks[i].v_x = -1*Math.abs(rocks[i].v_x)
+		if (rocks[i].x + ROCK_RADIUS > mainCanvasWidth || rocks[i].x - ROCK_RADIUS < 0) {
+			rocks[i].v_x = -rocks[i].v_x
 		}
 		if (rocks[i].y + ROCK_RADIUS > mainCanvasHeight || rocks[i].y - ROCK_RADIUS < 0) {
-			rocks[i].v_y = -1*Math.abs(rocks[i].v_y)
+			rocks[i].v_y = -rocks[i].v_y
 		}
 	}
 }
@@ -200,7 +200,7 @@ function drawCanvas() {
 		rock.y += rock.v_y
 		
 		// Apply friction
-		if (rock.v_x != 0) {
+/*		if (rock.v_x != 0) {
 			let theta = Math.atan(rock.v_y / rock.v_x)
 			let v = Math.sqrt(Math.pow(rock.v_x, 2) + Math.pow(rock.v_y, 2))
 			console.log('v: ' + v + ', theta: '+ theta + ', v_y: ' + rock.v_y + ", v_x: " + rock.v_x)
@@ -210,7 +210,7 @@ function drawCanvas() {
 			rock.v_x = v*Math.cos(theta)
 			rock.v_y = v*Math.sin(theta)
 		}
-		
+	*/	
 		context.beginPath()
 		context.arc(rock.x, rock.y, ROCK_RADIUS, 0, 2*Math.PI, true)
 		context.lineWidth = 5
