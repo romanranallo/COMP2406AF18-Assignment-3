@@ -127,22 +127,20 @@ function checkForCollisions() {
 		return a.y - b.y
 	})
 	
-	//console.log("after sort", rocks_copy)
-	
 	for (let i=0; i<rocks_copy.length-1; i++) {
 		if (rocks_copy[i+1].y - rocks_copy[i].y <= 2*ROCK_RADIUS) {
-			//console.log(rocks_copy[i])
-			//console.log(rocks_copy[i+1])
-			
 			if (collisionBetween(rocks_copy[i], rocks_copy[i+1])) {
-				
-				//console.log(rocks_copy[i])
-				//console.log(rocks_copy[i+1])
-				
 				resolveCollision(rocks_copy[i], rocks_copy[i+1])
 			}
 		}
-		
+	}
+	for (let i=0; i<rocks_copy.length; i++) {
+		if(rocks[i].x + ROCK_RADIUS > mainCanvasWidth || rocks[i].x - ROCK_RADIUS < 0) {
+			rocks[i].v_x = -1*Math.abs(rocks[i].v_x)
+		}
+		if (rocks[i].y + ROCK_RADIUS > mainCanvasHeight || rocks[i].y - ROCK_RADIUS < 0) {
+			rocks[i].v_y = -1*Math.abs(rocks[i].v_y)
+		}
 	}
 }
 
