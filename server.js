@@ -123,7 +123,14 @@ io.on("connection", function(socket) {
 			console.log("Player left")
 		}
 	})
-  })
+	
+    socket.on('rockData', function(data){
+		console.log('RECEIVED ROCK DATA: ' + data)
+		//to broadcast message to everyone including sender:
+		io.emit('rockData', data) //broadcast to everyone including sender
+	})
+
+})
   
   
 
