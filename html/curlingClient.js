@@ -207,8 +207,27 @@ function drawCanvas() {
 			console.log("v", v)
 			v -= FRICTION_CONSTANT
 			// Reset velocities based on constants
-			rock.v_x = v*Math.cos(theta)
-			rock.v_y = v*Math.sin(theta)
+			
+			if (rock.v_x >= 0 && rock.v_y >= 0) {
+				console.log('case 1')
+				rock.v_x = v*Math.cos(theta)
+				rock.v_y = v*Math.sin(theta)
+			}
+			else if (rock.v_x <= 0 && rock.v_y >= 0) {
+				console.log('case 2')
+				rock.v_x = -1*v*Math.cos(theta)
+				rock.v_y = -1*v*Math.sin(theta)
+			}
+			else if (rock.v_x >= 0 && rock.v_y <= 0) {
+				console.log('case 3')
+				rock.v_x = v*Math.cos(theta)
+				rock.v_y = v*Math.sin(theta)
+			}
+			else {
+				console.log('case 4')
+				rock.v_x = -1*v*Math.cos(theta)
+				rock.v_y = -1*v*Math.sin(theta)
+			}
 		}
 	*/	
 		context.beginPath()
@@ -338,8 +357,8 @@ function handleMouseUp(e) {
   $("#curlingFullCanvas").off("mouseup", handleMouseUp) //remove mouse up handler
   
   // Calculate the Euclidean distance between the rock and the cursor
-  let x_comp = rockPlayed.x - canvasX
-  let y_comp = rockPlayed.y - canvasY
+  let x_comp = (rockPlayed.x - canvasX)
+  let y_comp = (rockPlayed.y - canvasY)
   
   rockPlayed.v_x = x_comp/50
   rockPlayed.v_y = y_comp/50
