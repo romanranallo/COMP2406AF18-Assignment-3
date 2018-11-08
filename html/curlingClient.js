@@ -3,6 +3,7 @@
 /
 */
 
+let counter = 0
 const mainCanvas = document.getElementById('curlingFullCanvas')
 const zoomedCanvas = document.getElementById('curlingCloseUp')
 
@@ -50,24 +51,27 @@ function joinGame() {
 }
 
 socket.on('rockData', function(data) {
-	console.log("data: " + data)
-	console.log("typeof: " + typeof data)
+	//console.log("data: " + data)
+	//console.log("typeof: " + typeof data)
 	
 	let rockInfo = JSON.parse(data)
-	console.log("rock info", rockInfo)
-	console.log("rock array BEFORE", rocks)
+	//console.log("rock info", rockInfo)
+	//console.log("rock array BEFORE", rocks)
 	let rock = rocks[rockInfo.id]
 	rock.x = rockInfo.x
 	rock.y = rockInfo.y
 	rock.v_x = rockInfo.v_x
 	rock.v_y = rockInfo.v_y
-	console.log("rock array AFTER", rocks)
+	//console.log("rock array AFTER", rocks)
 	//rocks[rockInfo.id] = rock
 	//drawCanvas()
 })
 
 function collisionBetween(rock1, rock2) {
 	if(Math.pow((Math.pow(rock1.x-rock2.x,2)+Math.pow(rock1.y-rock2.y, 2)), 0.5) <= 2*ROCK_RADIUS) {
+		
+		console.log(Math.pow((Math.pow(rock1.x-rock2.x,2)+Math.pow(rock1.y-rock2.y, 2)), 0.5))
+		
 		return true
 	}
 	else { return false}
@@ -76,18 +80,27 @@ function collisionBetween(rock1, rock2) {
 function resolveCollision(rock1, rock2) {
 	
 	console.log("Rock 1 before collision: ", rock1)
-	
+	let d = Math.pow((Math.pow(rock1.x-rock2.x,2)+Math.pow(rock1.y-rock2.y, 2)), 0.5)
 	let theta = Math.atan((rock2.y-rock1.y)/(rock2.x-rock1.x))
+	
+	if (rock2.y > rock1.y) {rock2.y += (2*ROCK_RADIUS-d)*Math.cos(theta)}
+	else {rock1.y += (2*ROCK_RADIUS-d)*Math.cos(theta)}
+	
+	if(rock2.x > rock1.x) {rock2.x += (2*ROCK_RADIUS-d)*Math.sin(theta)}
+	else {rock1.x += (2*ROCK_RADIUS-d)*Math.sin(theta)}
+	
 	let deltaV_1 = getDeltaVel(rock1, theta)
 	let deltaV_2 = getDeltaVel(rock2, theta)
 	
-	console.log(deltaV_1)
-	console.log(deltaV_2)
+	if (deltaV_1.v_x > 10 || deltaV_1.v_y > 10 || deltaV_2.v_x > 10 || deltaV_2.v_y > 10) {
+		console.log(counter)
+		console.log(deltaV_1)
+		console.log(deltaV_2)
+	}
+	
+	//console.log("Rock 1 before collision: ", rock1)
+	//console.log("Rock 2 before collision: ", rock2)
 
-	
-	console.log("Rock 1 before collision: ", rock1)
-	console.log("Rock 2 before collision: ", rock2)
-	
 	rock1.v_x -= deltaV_1.v_x
 	rock1.v_y -= deltaV_1.v_y
 	rock2.v_x += deltaV_1.v_x
@@ -99,23 +112,30 @@ function resolveCollision(rock1, rock2) {
 	rock1.v_x += deltaV_2.v_x
 	rock1.v_y += deltaV_2.v_y
 	
-	console.log("Rock 1 after collision: ", rock1)
-	console.log("Rock 2 after collision: ", rock2)
-	
+	//console.log("Rock 1 after collision: ", rock1)
+	//console.log("Rock 2 after collision: ", rock2)
+
 	return
 }
 
 function getDeltaVel(rock, theta) {
 	let phi  
 	if (rock.v_x !== 0) {
-		phi = Math.atan((rock.v_y/rock.v_x))
+		phi = Math.atan((Math.abs(rock.v_y)/Math.abs(rock.v_x)))
 	}
 	else {phi = 90}
 	let alpha = phi-theta
-	let v = rock.v_y/Math.sin(phi)
+	let v = Math.abs(rock.v_y)/Math.sin(phi)
 	let u = v*Math.cos(alpha)
 	let u_x = u*Math.cos(alpha)
 	let u_y = u*Math.sin(alpha)
+	
+	if(rock.v_x >= 0) 	{u_x = Math.abs(u_x)}
+	else				{u_x = -Math.abs(u_x)}
+
+	if(rock.v_y >= 0)	{u_y = Math.abs(u_y)}
+	else				{u_y = -Math.abs(u_y)}
+		
 	let deltaV = {v_x:u_x, v_y:u_y}
 	return deltaV
 }
@@ -200,36 +220,36 @@ function drawCanvas() {
 		rock.y += rock.v_y
 		
 		// Apply friction
-/*		if (rock.v_x != 0) {
+		if (rock.v_x != 0) {
 			let theta = Math.atan(rock.v_y / rock.v_x)
 			let v = Math.sqrt(Math.pow(rock.v_x, 2) + Math.pow(rock.v_y, 2))
-			console.log('v: ' + v + ', theta: '+ theta + ', v_y: ' + rock.v_y + ", v_x: " + rock.v_x)
-			console.log("v", v)
+			//console.log('v: ' + v + ', theta: '+ theta + ', v_y: ' + rock.v_y + ", v_x: " + rock.v_x)
+			//console.log("v", v)
 			v -= FRICTION_CONSTANT
 			// Reset velocities based on constants
 			
 			if (rock.v_x >= 0 && rock.v_y >= 0) {
-				console.log('case 1')
+				//console.log('case 1')
 				rock.v_x = v*Math.cos(theta)
 				rock.v_y = v*Math.sin(theta)
 			}
 			else if (rock.v_x <= 0 && rock.v_y >= 0) {
-				console.log('case 2')
+				//console.log('case 2')
 				rock.v_x = -1*v*Math.cos(theta)
 				rock.v_y = -1*v*Math.sin(theta)
 			}
 			else if (rock.v_x >= 0 && rock.v_y <= 0) {
-				console.log('case 3')
+				//console.log('case 3')
 				rock.v_x = v*Math.cos(theta)
 				rock.v_y = v*Math.sin(theta)
 			}
 			else {
-				console.log('case 4')
+				//console.log('case 4')
 				rock.v_x = -1*v*Math.cos(theta)
 				rock.v_y = -1*v*Math.sin(theta)
 			}
 		}
-	*/	
+		
 		context.beginPath()
 		context.arc(rock.x, rock.y, ROCK_RADIUS, 0, 2*Math.PI, true)
 		context.lineWidth = 5
@@ -269,7 +289,7 @@ function drawCanvas() {
 
 
 function handleTimer() {
-  
+  counter++
   checkForCollisions()	
   drawCanvas()
 }
@@ -282,14 +302,14 @@ function handleMouseDown(e) {
   //var canvasY = e.clientY - rect.top
   canvasX = e.clientX - rect.left //use jQuery event object clientX and clientY
   canvasY = e.clientY - rect.top
-  console.log("mouse down:" + canvasX + ", " + canvasY)
+  //console.log("mouse down:" + canvasX + ", " + canvasY)
 
   // Find if player clicked on a rock
   for (let i = 0; i < rocks.length; i++) {
 
 	  let rock = rocks[i]
 	  if (Math.abs(canvasX - rock.x) <= ROCK_RADIUS && Math.abs(canvasY - rock.y) <= ROCK_RADIUS) {
-		  console.log("ROCK FOUND", rock)
+		  //console.log("ROCK FOUND", rock)
 		  rockPlayed = rock
 		  break
 	  }
