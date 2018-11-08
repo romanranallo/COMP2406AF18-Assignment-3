@@ -227,6 +227,7 @@ function drawCanvas() {
 			//console.log("v", v)
 			v -= FRICTION_CONSTANT
 			// Reset velocities based on constants
+			if (v <= 0.001) v = 0
 			
 			if (rock.v_x >= 0 && rock.v_y >= 0) {
 				//console.log('case 1')
