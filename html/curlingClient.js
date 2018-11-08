@@ -73,7 +73,39 @@ function collisionBetween(rock1, rock2) {
 }
 
 function resolveCollision(rock1, rock2) {
+	let theta = Math.atan((rock2.y-rock1.y)/(rock2.x-rock1.x))
+	let deltaV_1 = getDeltaVel(rock1, theta)
+	let deltaV_2 = getDeltaVel(rock2, theta)
+	
+	console.log("Rock 1 before collision: ", rock1)
+	console.log("Rock 2 before collision: ", rock2)
+	
+	rock1.v_x -= deltaV_1.v_x
+	rock1.v_y -= deltaV_1.v_y
+	rock2.v_x += deltaV_1.v_x
+	rock2.v_y += deltaV_1.v_y
+	
+	
+	rock2.v_x -= deltaV_2.v_x
+	rock2.v_y -= deltaV_2.v_y
+	rock1.v_x += deltaV_2.v_x
+	rock1.v_y += deltaV_2.v_y
+	
+	console.log("Rock 1 after collision: ", rock1)
+	console.log("Rock 2 after collision: ", rock2)
+	
 	return
+}
+
+function getDeltaVel(rock, theta) {
+	let phi = Math.atan((rock.v_y/rock.v_x))
+	let alpha = phi-theta
+	let v = rock.v_y/Math.sin(phi)
+	let u = v*Math.cos(alpha)
+	let u_x = u*Math.cos(alpha)
+	let u_y = u*Math.sin(alpha)
+	let deltaV = {v_x:u_x, v_y:u_y}
+	return deltaV
 }
 
 function checkForCollisions() {
@@ -181,7 +213,8 @@ function drawCanvas() {
 
 
 function handleTimer() {
-
+  
+  checkForCollisions()	
   drawCanvas()
 }
 
