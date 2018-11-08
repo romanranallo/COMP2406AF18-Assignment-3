@@ -81,10 +81,11 @@ socket.on('rocksData', function(data) {
 	console.log("rocksData", data)
 	for (let i = 0; i < rockArr.length; i++) {
 		let rock = rocks[i]
-		rock.x = data.x
-		rock.y = data.y
-		rock.v_x = data.v_x
-		rock.v_y = data.v_y
+		let rock_from_data = rockArr[i]
+		rock.x = rock_from_data.x
+		rock.y = rock_from_data.y
+		rock.v_x = rock_from_data.v_x
+		rock.v_y = rock_from_data.v_y
 	}
 	
 })
