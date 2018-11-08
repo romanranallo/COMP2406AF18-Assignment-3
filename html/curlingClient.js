@@ -37,7 +37,6 @@ socket.on("playGame", function(data) {
 	}
 })
 
-<<<<<<< HEAD
 function watchGame() {
 	socket.emit("watchGame")
 	connectMouseListener(false)
@@ -49,7 +48,6 @@ function joinGame() {
 	socket.emit("playGame")
 }
 
-=======
 socket.on('rockData', function(data) {
 	console.log("data: " + data)
 	console.log("typeof: " + typeof data)
@@ -62,7 +60,6 @@ socket.on('rockData', function(data) {
 	//rocks[rockInfo.id] = rock
 	drawCanvas()
 })
->>>>>>> 51fab2c2ab379440c440b6dcbbf16e0c11bc857e
 
 function collisionBetween(rock1, rock2) {
 	if(Math.pow((Math.pow(rock1.x-rock2.x,2)+Math.pow(rock1.y-rock2.y, 2)), 0.5) <= 2*ROCK_RADIUS) {
