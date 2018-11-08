@@ -14,4 +14,7 @@ Once cmd is in that directory, enter "node server.js" to start the server.
 To run:
 As per the server's instructions, go to http://localhost:3000/assignment3.html once it is running
 
+To play:
+As per the instructions, click the appropriate button to take/give up control of a rock. Click on a rock and drag to 'catapult' it.
+
 ISSUES:

@@ -43,13 +43,14 @@ socket.on("playGame", function(data) {
 		}
 		else {
 			isControllingYellow = true
-			document.getElementById("text-area").innerText = "Hi " + name + ". You have control of RED"
+			document.getElementById("text-area").innerText = "Hi " + name + ". You have control of YELLOW"
 		}
 		connectMouseListener(true)
 		document.getElementById('joinButton').disabled = true
 		
 	}
 	else {
+		document.getElementById("text-area").innerHTML = "Hi " + name + ". Both rocks are being used. Keep trying if you'd wish to play."
 		connectMouseListener(false)
 	}
 })
@@ -64,17 +65,20 @@ socket.on('requestData', function() {
 
 function watchGame() {
 	socket.emit("watchGame")
+	isControllingRed = false
+	isControllingYellow = false
+	document.getElementById('text-area').innerHTML = "You have relinqueshed control of the rock. Click 'join' to re-join'"
 	connectMouseListener(false)
 	document.getElementById('joinButton').disabled = false
 	
 }
 
 function joinGame() {
-	if ($('#userTextField').val() == '') {
+	if ($('#userTextField').val() == '' && name == '') {
 		window.alert("Please enter your name")
 		return 
 	}
-	name = $('#userTextField').val()
+	if (name == '') name = $('#userTextField').val()
 	$('#userTextField').val('')
 	
 	socket.emit("playGame")
@@ -495,6 +499,8 @@ $(document).ready(function() {
   //add key handler for the document as a whole, not separate words[i]ments.
   $(document).keydown(handleKeyDown)
   $(document).keyup(handleKeyUp)
+  
+  document.getElementById("text-area").innerHTML = "Welcome. Click 'Join Game' to take control of a rock. Click 'Watch Game' to give up the rock."
 
 
 
