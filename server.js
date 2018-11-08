@@ -70,6 +70,8 @@ function addPlayer(player) {
 function removePlayer(player) {
 	players.pop(player)
 	playersFull = false	
+	if (player == redPlayer) redPlayer = null
+	else if (player == yellowPlayer) yellowPlayer = null
 	if (player === host) {
 		if (players.length === 0) {
 			if(spectators.length === 0) {
