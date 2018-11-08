@@ -9,7 +9,14 @@ const zoomedCanvas = document.getElementById('curlingCloseUp')
 const mainCanvasHeight = mainCanvas.height
 const mainCanvasWidth = mainCanvas.width
 
-let rocks = []
+let rocks = [  // Add initial rocks
+  { id: 1, colour:'red', x: 25, y: 500, played: false},
+  { id: 2, colour: 'yellow', x: 40, y: 150, played: false},
+  { id: 3, colour: 'red', x:70, y:50, played: false},
+  { id: 4, colour: 'yellow', x:70, y:60, played: false},
+  { id: 5, colour: 'red', x:60, y:80, played: false},
+  { id: 6, colour: 'yellow', x:59, y:300, played: false}
+]
 const ROCK_RADIUS = 12
 const ZOOM_ROCK_RADIUS = 4*ROCK_RADIUS
 
@@ -28,9 +35,9 @@ socket.on("playGame", function(data) {
 	else {
 		connectMouseListener(false)
 	}
-	console.log(retData.isPlayer)
 })
 
+<<<<<<< HEAD
 function watchGame() {
 	socket.emit("watchGame")
 	connectMouseListener(false)
@@ -42,6 +49,20 @@ function joinGame() {
 	socket.emit("playGame")
 }
 
+=======
+socket.on('rockData', function(data) {
+	console.log("data: " + data)
+	console.log("typeof: " + typeof data)
+	
+	let rockInfo = JSON.parse(data)
+	console.log("rock info", rockInfo)
+	let rock = rocks.find(rock => rock.id = rockInfo.id)
+	rock.x = rockInfo.x
+	rock.y = rockInfo.y
+	//rocks[rockInfo.id] = rock
+	drawCanvas()
+})
+>>>>>>> 51fab2c2ab379440c440b6dcbbf16e0c11bc857e
 
 function collisionBetween(rock1, rock2) {
 	if(Math.pow((Math.pow(rock1.x-rock2.x,2)+Math.pow(rock1.y-rock2.y, 2)), 0.5) <= 2*ROCK_RADIUS) {
@@ -152,7 +173,7 @@ function handleTimer() {
 }
 
 function handleMouseDown(e) {
-  
+  rockPlayed = null
   //get mouse location relative to canvas top left
   let rect = mainCanvas.getBoundingClientRect()
   //var canvasX = e.clientX - rect.left
@@ -166,7 +187,7 @@ function handleMouseDown(e) {
 
 	  let rock = rocks[i]
 	  if (Math.abs(canvasX - rock.x) <= ROCK_RADIUS && Math.abs(canvasY - rock.y) <= ROCK_RADIUS) {
-		  console.log(rock)
+		  console.log("ROCK FOUND", rock)
 		  rockPlayed = rock
 		  break
 	  }
@@ -180,8 +201,11 @@ function handleMouseDown(e) {
     $("#curlingFullCanvas").mouseup(handleMouseUp)
 	  
   }
+  else return
   
-  
+  let dataObj = { id: rockPlayed.id, x: rockPlayed.x, y: rockPlayed.y }
+  let jsonString = JSON.stringify(dataObj)
+  socket.emit("rockData",jsonString)
   e.stopPropagation()
   e.preventDefault()
   
@@ -201,6 +225,9 @@ function handleMouseMove(e) {
   rockPlayed.y = canvasY + deltaY
 
   e.stopPropagation()
+  let dataObj = { id: rockPlayed.id, x: rockPlayed.x, y: rockPlayed.y }
+  let jsonString = JSON.stringify(dataObj)
+  socket.emit("rockData", jsonString)
 
   drawCanvas()
 }
@@ -217,8 +244,10 @@ function handleMouseUp(e) {
   //remove mouse move and mouse up handlers but leave mouse down handler
   $("#curlingFullCanvas").off("mousemove", handleMouseMove) //remove mouse move handler
   $("#curlingFullCanvas").off("mouseup", handleMouseUp) //remove mouse up handler
+  let dataObj = { id: rockPlayed.id, x: rockPlayed.x, y: rockPlayed.y }
+  let jsonString = JSON.stringify(dataObj)
+  socket.emit("rockData", jsonString)
 
-  drawCanvas() //redraw the canvas
 }
 
 $(document).ready(function() {
@@ -227,13 +256,7 @@ $(document).ready(function() {
   timer = setInterval(handleTimer, 100)
   //clearTimeout(timer) //to stop
   
-  // Add initial rocks
-  rocks.push({ colour:'red', x: 25, y: 500, played: false})
-  rocks.push({ colour: 'yellow', x: 40, y: 150, played: false})
-  rocks.push({ colour: 'red', x:70, y:50, played: false})
-  rocks.push({ colour: 'yellow', x:70, y:60, played: false})
-  rocks.push({ colour: 'red', x:60, y:80, played: false})
-  rocks.push({ colour: 'yellow', x:59, y:300, played: false})
+
 
   drawCanvas()
   
