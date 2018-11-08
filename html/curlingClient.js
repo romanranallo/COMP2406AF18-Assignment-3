@@ -19,7 +19,7 @@ let rocks = [  // Add initial rocks
 ]
 const ROCK_RADIUS = 12
 const ZOOM_ROCK_RADIUS = 4*ROCK_RADIUS
-let isPlayer = false
+
 let socket = io("http://" + window.document.location.host)
 
 let rockPlayed
@@ -27,14 +27,15 @@ let deltaX, deltaY
 
 socket.on("playGame", function(data) {
 	let retData = JSON.parse(data)
-	isPlayer = retData.isPlayer
-	if (!isPlayer) {
-		connectMouseListener(false)
+	if (retData.isPlayer) {
+		connectMouseListener(true)
+		document.getElementById('joinButton').disabled = true
+		
 	}
 	else {
-		connectMouseListener(true)
+		connectMouseListener(false)
 	}
-	console.log(isPlayer)
+	console.log(retData.isPlayer)
 })
 
 socket.on('rockData', function(data) {
@@ -77,17 +78,14 @@ function checkForCollisions() {
 }
 
 function watchGame() {
-	socket.emit("watchGame", function(res) {
-		isPlayer = res.isPlayer
-		connectMouseListener(res.IsPlayer)
-	})
+	socket.emit("watchGame")
+	connectMouseListener(false)
+	document.getElementById('joinButton').disabled = false
+	
 }
 
 function joinGame() {
 	socket.emit("playGame")
-	isPlayer = true
-	connectMouseListener(true)
-	document.getElementById('joinButton').disabled = true
 }
 
 function connectMouseListener(choice) {
