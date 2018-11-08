@@ -11,12 +11,12 @@ const mainCanvasHeight = mainCanvas.height
 const mainCanvasWidth = mainCanvas.width
 
 let rocks = []  // Add initial rocks
-rocks.push({ id: 0, colour:'red', x: 25, y: 500, played: false, v_x: 0, v_y: 0})
-rocks.push({ id: 1, colour: 'yellow', x: 40, y: 150, played: false, v_x: 0, v_y: 0})
-rocks.push({ id: 2, colour: 'red', x:70, y:50, played: false, v_x: 0, v_y: 0})
-rocks.push({ id: 3, colour: 'yellow', x:70, y:100, played: false, v_x: 0, v_y: 0})
-rocks.push({ id: 4, colour: 'red', x:70, y:150, played: false, v_x: 0, v_y: 0})
-rocks.push({ id: 5, colour: 'yellow', x:59, y:300, played: false, v_x: 0, v_y: 0})
+rocks.push({ id: 0, colour:'red', x: 25, y: 500, v_x: 0, v_y: 0})
+rocks.push({ id: 1, colour: 'yellow', x: 40, y: 150, v_x: 0, v_y: 0})
+rocks.push({ id: 2, colour: 'red', x:70, y:50, v_x: 0, v_y: 0})
+rocks.push({ id: 3, colour: 'yellow', x:70, y:100, v_x: 0, v_y: 0})
+rocks.push({ id: 4, colour: 'red', x:70, y:150, v_x: 0, v_y: 0})
+rocks.push({ id: 5, colour: 'yellow', x:59, y:300, v_x: 0, v_y: 0})
 const ROCK_RADIUS = 12
 const ZOOM_ROCK_RADIUS = 4*ROCK_RADIUS
 const FRICTION_CONSTANT = 0.002
