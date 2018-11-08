@@ -31,6 +31,18 @@ socket.on("playGame", function(data) {
 	console.log(retData.isPlayer)
 })
 
+function watchGame() {
+	socket.emit("watchGame")
+	connectMouseListener(false)
+	document.getElementById('joinButton').disabled = false
+	
+}
+
+function joinGame() {
+	socket.emit("playGame")
+}
+
+
 function collisionBetween(rock1, rock2) {
 	if(Math.pow((Math.pow(rock1.x-rock2.x,2)+Math.pow(rock1.y-rock2.y, 2)), 0.5) <= 2*ROCK_RADIUS) {
 		return true
@@ -55,17 +67,6 @@ function checkForCollisions() {
 		}
 		
 	}
-}
-
-function watchGame() {
-	socket.emit("watchGame")
-	connectMouseListener(false)
-	document.getElementById('joinButton').disabled = false
-	
-}
-
-function joinGame() {
-	socket.emit("playGame")
 }
 
 function connectMouseListener(choice) {
