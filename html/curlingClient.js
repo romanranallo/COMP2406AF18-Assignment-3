@@ -18,6 +18,7 @@ rocks.push({ id: 4, colour: 'red', x:60, y:80, played: false, v_x: 0, v_y: 0})
 rocks.push({ id: 5, colour: 'yellow', x:59, y:300, played: false, v_x: 0, v_y: 0})
 const ROCK_RADIUS = 12
 const ZOOM_ROCK_RADIUS = 4*ROCK_RADIUS
+const FRICTION_CONSTANT = 0.05
 
 let socket = io("http://" + window.document.location.host)
 
@@ -141,9 +142,23 @@ function drawCanvas() {
 	// Draw rocks
 	for (let i = 0; i < rocks.length; i++) {
 		let rock = rocks[i]
-		// Deal with speed
+		
+		// Adjust speed based on velocitu
 		rock.x += rock.v_x
 		rock.y += rock.v_y
+		
+		// Apply friction
+		if (rock.v_y != 0) {
+			let theta = Math.tan(rock.v_x / rock.v_y)
+			let v = Math.sqrt(Math.pow(rock.v_x, 2) + Math.pow(rock.v_y, 2))
+			console.log('v: ' + v + ', theta: '+ theta + ', v_y: ' + rock.v_y + ", v_x: " + rock.v_x)
+			console.log("v", v)
+			//v -= FRICTION_CONSTANT
+			// Reset velocities based on constants
+			//rock.v_x -= FRICTION_CONSTANT
+			//rock.v_y -= FRICTION_CONSTANT
+		}
+		
 		context.beginPath()
 		context.arc(rock.x, rock.y, ROCK_RADIUS, 0, 2*Math.PI, true)
 		context.lineWidth = 5
@@ -166,6 +181,8 @@ function drawCanvas() {
 		
 		context = mainCanvas.getContext('2d')
 	}
+	
+
 	
 	if (rockPlayed != null) {
 		context.beginPath()
