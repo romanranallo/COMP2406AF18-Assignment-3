@@ -11,12 +11,12 @@ const mainCanvasHeight = mainCanvas.height
 const mainCanvasWidth = mainCanvas.width
 
 let rocks = []  // Add initial rocks
-rocks.push({ id: 0, colour:'red', x: 25, y: 500, v_x: 0, v_y: 0})
-rocks.push({ id: 1, colour: 'yellow', x: 40, y: 150, v_x: 0, v_y: 0})
-rocks.push({ id: 2, colour: 'red', x:70, y:50, v_x: 0, v_y: 0})
-rocks.push({ id: 3, colour: 'yellow', x:70, y:100, v_x: 0, v_y: 0})
-rocks.push({ id: 4, colour: 'red', x:70, y:150, v_x: 0, v_y: 0})
-rocks.push({ id: 5, colour: 'yellow', x:59, y:300, v_x: 0, v_y: 0})
+rocks.push({ id: 0, colour:'red', x: -55, y: -50, v_x: 0, v_y: 0})
+rocks.push({ id: 1, colour: 'yellow', x: -50, y: -50, v_x: 0, v_y: 0})
+rocks.push({ id: 2, colour: 'red', x:-50, y: -50, v_x: 0, v_y: 0})
+rocks.push({ id: 3, colour: 'yellow', x:-50, y: -50, v_x: 0, v_y: 0})
+rocks.push({ id: 4, colour: 'red', x:-50, y:-50, v_x: 0, v_y: 0})
+rocks.push({ id: 5, colour: 'yellow', x:-50, y:-50, v_x: 0, v_y: 0})
 const ROCK_RADIUS = 12
 const ZOOM_ROCK_RADIUS = 4*ROCK_RADIUS
 const FRICTION_CONSTANT = 0.002
@@ -55,6 +55,7 @@ socket.on("playGame", function(data) {
 	}
 })
 
+/*
 socket.on('requestData', function() {
 	console.log("In request data")
 	for (let i=0; i<rocks.length; i++) {
@@ -62,7 +63,9 @@ socket.on('requestData', function() {
 		socket.emit('rockData', JSON.stringify(rocks[i]))
 	}
 })
+*/
 
+//handle watch game button
 function watchGame() {
 	socket.emit("watchGame")
 	isControllingRed = false
@@ -70,9 +73,13 @@ function watchGame() {
 	document.getElementById('text-area').innerHTML = "You have relinqueshed control of the rock. Click 'join' to re-join'"
 	connectMouseListener(false)
 	document.getElementById('joinButton').disabled = false
-	
 }
 
+function resetRocks() {
+	socket.emit('reset')
+}
+
+//handle join game button
 function joinGame() {
 	if ($('#userTextField').val() == '' && name == '') {
 		window.alert("Please enter your name")
@@ -84,6 +91,7 @@ function joinGame() {
 	socket.emit("playGame")
 }
 
+//set data of single rock based on data from server
 socket.on('rockData', function(data) {
 	console.log("data: " + data)
 	//console.log("typeof: " + typeof data)
@@ -101,6 +109,7 @@ socket.on('rockData', function(data) {
 	//drawCanvas()
 })
 
+//set data of all rocks based on data from server
 socket.on('rocksData', function(data) {
 	rockArr = JSON.parse(data)
 	console.log("rocksData", data)
@@ -115,11 +124,10 @@ socket.on('rocksData', function(data) {
 	
 })
 
+//check if two rocks have collided
 function collisionBetween(rock1, rock2) {
 	if(Math.pow((Math.pow(rock1.x-rock2.x,2)+Math.pow(rock1.y-rock2.y, 2)), 0.5) <= 2*ROCK_RADIUS) {
-		
-		console.log(Math.pow((Math.pow(rock1.x-rock2.x,2)+Math.pow(rock1.y-rock2.y, 2)), 0.5))
-		
+		//console.log(Math.pow((Math.pow(rock1.x-rock2.x,2)+Math.pow(rock1.y-rock2.y, 2)), 0.5))
 		return true
 	}
 	else { return false}
@@ -131,35 +139,42 @@ function resolveCollision(rock1, rock2) {
 	let d = Math.pow((Math.pow(rock1.x-rock2.x,2)+Math.pow(rock1.y-rock2.y, 2)), 0.5)
 	let theta = Math.atan((rock2.y-rock1.y)/(rock2.x-rock1.x))
 	
-	if (rock2.y > rock1.y) {rock2.y += (2*ROCK_RADIUS-d)*Math.cos(theta)}
-	else {rock1.y += (2*ROCK_RADIUS-d)*Math.cos(theta) + 5}
+	//move the rocks so they are no longer overlapping
+	if (rock2.y > rock1.y) {rock2.y += (2*ROCK_RADIUS-d)*Math.cos(theta)+3}
+	else {rock1.y += (2*ROCK_RADIUS-d)*Math.cos(theta) +3}
 	
-	if(rock2.x > rock1.x) {rock2.x += (2*ROCK_RADIUS-d)*Math.sin(theta)}
-	else {rock1.x += (2*ROCK_RADIUS-d)*Math.sin(theta) + 5}
+	//move rocks so they are no longer overlapping
+	if(rock2.x > rock1.x) {rock2.x += (2*ROCK_RADIUS-d)*Math.sin(theta)+3}
+	else {rock1.x += (2*ROCK_RADIUS-d)*Math.sin(theta)+3}
 	
+	//compute velocites along angle of collision for each rock
 	let deltaV_1 = getDeltaVel(rock1, theta)
 	let deltaV_2 = getDeltaVel(rock2, theta)
 	
+	//debug
+	/*
 	if (deltaV_1.v_x > 10 || deltaV_1.v_y > 10 || deltaV_2.v_x > 10 || deltaV_2.v_y > 10) {
 		console.log(counter)
 		console.log(deltaV_1)
 		console.log(deltaV_2)
 	}
+	*/
 	
 	//console.log("Rock 1 before collision: ", rock1)
 	//console.log("Rock 2 before collision: ", rock2)
-
+	
+	//change velocities
 	rock1.v_x -= deltaV_1.v_x
 	rock1.v_y -= deltaV_1.v_y
 	rock2.v_x += deltaV_1.v_x
 	rock2.v_y += deltaV_1.v_y
-	
 	
 	rock2.v_x -= deltaV_2.v_x
 	rock2.v_y -= deltaV_2.v_y
 	rock1.v_x += deltaV_2.v_x
 	rock1.v_y += deltaV_2.v_y
 	
+	//reduce by scalar for each collision
 	rock1.v_x *= 0.8
 	rock1.v_y *= 0.8
 	rock2.v_x *= 0.8
@@ -173,11 +188,19 @@ function resolveCollision(rock1, rock2) {
 
 function getDeltaVel(rock, theta) {
 	let phi  
+	//dont divide by zero!
 	if (rock.v_x !== 0) {
 		phi = Math.atan((Math.abs(rock.v_y)/Math.abs(rock.v_x)))
 	}
 	else {phi = 90}
-	let alpha = phi-theta
+	let alpha
+	
+	//change angle depending on which quadrant the velocity vector is in
+	if(rock.v_x >= 0 && rock.v_y >= 0) {alpha = phi-theta}
+	else if (rock.v_x >= 0 && rock.v_y <= 0) {alpha = phi+theta}
+	else if (rock.v_x <= 0 && rock.v_y >= 0) {alpha = phi+theta}
+	else {alpha = phi-theta}
+	
 	let v = Math.abs(rock.v_y)/Math.sin(phi)
 	let u = v*Math.cos(alpha)
 	let u_x = u*Math.cos(alpha)
@@ -194,12 +217,15 @@ function getDeltaVel(rock, theta) {
 }
 
 function checkForCollisions() {
-	
 	rocks_copy = rocks.slice()
+	
+	// use this if collision detection changed to prune the number of combinations	
+/*	
 	rocks_copy.sort(function(a,b) {
 		return a.y - b.y
 	})
-	
+*/	
+	//check each pair of rocks for collision
 	for (let i=0; i<rocks_copy.length; i++) {
 		for (let j=0; j<rocks_copy.length; j++){
 			if (i == j) {continue}
@@ -210,22 +236,27 @@ function checkForCollisions() {
 			}
 		}
 	}
+	//make rocks bounce off walls, reduce speed a little 
 	for (let i=0; i<rocks_copy.length; i++) {
+		//hit right wall
 		if (rocks[i].x + ROCK_RADIUS > mainCanvasWidth)  {
 			rocks[i].v_x = -Math.abs(rocks[i].v_x)
 			rocks[i].v_x *= 0.8
 			rocks[i].x = mainCanvasWidth-ROCK_RADIUS
 		}
+		//hit left wall
 		else if(rocks[i].x - ROCK_RADIUS < 0) {
 			rocks[i].v_x = Math.abs(rocks[i].v_x)
 			rocks[i].v_x *= 0.8
 			rocks[i].x = ROCK_RADIUS
 		}
+		//hit bottom wall
 		if (rocks[i].y + ROCK_RADIUS > mainCanvasHeight)  {
 			rocks[i].v_y = -Math.abs(rocks[i].v_y)
 			rocks[i].v_y *= 0.8
 			rocks[i].y = mainCanvasHeight-ROCK_RADIUS
 		}
+		//hit top wall
 		else if (rocks[i].y - ROCK_RADIUS < 0) {
 			rocks[i].v_y = Math.abs(rocks[i].v_y)
 			rocks[i].v_y *= 0.8
@@ -345,8 +376,6 @@ function drawCanvas() {
 		context = mainCanvas.getContext('2d')
 	}
 	
-
-	
 	if (rockPlayed != null) {
 		context.beginPath()
 		context.moveTo(rockPlayed.x, rockPlayed.y)
@@ -354,14 +383,17 @@ function drawCanvas() {
 		context.strokeStyle = 'black'
 		context.stroke()
 	}
-	
-	
-	
 }
-
 
 function handleTimer() {
   counter++
+  counter %= 100
+  if (counter === 0) {
+	  for (let i=0; i<rocks.length; i++) {
+		  socket.emit('rockData', rocks[i])
+	  }
+  }
+  
   checkForCollisions()	
   drawCanvas()
 }
@@ -499,7 +531,7 @@ $(document).ready(function() {
   //add key handler for the document as a whole, not separate words[i]ments.
   $(document).keydown(handleKeyDown)
   $(document).keyup(handleKeyUp)
-  
+ 
   document.getElementById("text-area").innerHTML = "Welcome. Click 'Join Game' to take control of a rock. Click 'Watch Game' to give up the rock."
 
 

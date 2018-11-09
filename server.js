@@ -44,16 +44,22 @@ const get_mime = function(filename) {
   return MIME_TYPES["txt"]
 }
 
-let rocks = []
-rocks.push({id: 0, x: 20, y: 500, v_x: 0, v_y: 0})
-rocks.push({id: 1, x: 50, y: 500, v_x: 0, v_y: 0})
-rocks.push({id: 2, x: 80, y: 500, v_x: 0, v_y: 0})
-rocks.push({id: 3, x: 110, y: 510, v_x: 0, v_y: 0})
-rocks.push({id: 4, x: 20, y: 100, v_x: 0, v_y: 0})
-rocks.push({id: 5, x: 70, y: 300, v_x: 0, v_y: 0})
+let rocks
 let spectators = []
 let players = []
 let playersFull = false
+
+function setRocks(){
+	rocks = []
+	rocks.push({id: 0, x: 20, y: 500, v_x: 0, v_y: 0})
+	rocks.push({id: 1, x: 100, y: 500, v_x: 0, v_y: 0})
+	rocks.push({id: 2, x: 50, y: 500, v_x: 0, v_y: 0})
+	rocks.push({id: 3, x: 130, y: 500, v_x: 0, v_y: 0})
+	rocks.push({id: 4, x: 35, y: 530, v_x: 0, v_y: 0})
+	rocks.push({id: 5, x: 115, y: 530, v_x: 0, v_y: 0})
+}
+
+setRocks()
 
 function addPlayer(player) {
 	if (players.length === 0) {
@@ -185,15 +191,20 @@ io.on("connection", function(socket) {
 		io.emit('rockData', data) //broadcast to everyone including sender
 	})
 	
-	/*socket.on('requestData', function(data) {
+	socket.on('reset', function(){
+		setRocks()
+		io.emit("rocksData", JSON.stringify(rocks))
+	})
+	
+/*	socket.on('requestData', function(data) {
 		console.log("host is null:", (host==null))
 		if(host != null) {
 			console.log("ask host for data")
 			host.emit('requestData')
 		}
-	})*/
-	
-	io.emit("rocksData", JSON.stringify(rocks))
+	})
+*/	
+	socket.emit("rocksData", JSON.stringify(rocks))
 	
 	//socket.on('updateFromHost', function(data) {
 		//io.emit('rockData', data)
